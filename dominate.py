@@ -50,7 +50,7 @@ class RowTotals(html.DIV):
             t = CurrentTotal("R", rowindex, 0)
             self.currenttotals.append(t)
             self <= t
-        
+
 class ColumnTotals(html.DIV):
     def __init__(self, board):
         html.DIV.__init__(self, "", style={"position":"absolute", "border":"{0}px solid #820a0a".format(borderwidth), "font-size":"{0}px".format(innersize*0.7), "text-align":"center", "line-height":"{0}px".format(innersize)})
@@ -67,7 +67,7 @@ class ColumnTotals(html.DIV):
             t = CurrentTotal("C", colindex, 0)
             self.currenttotals.append(t)
             self <= t
-        
+
 class RequiredTotal(html.DIV):
     def __init__(self, line, index, total):
         html.DIV.__init__(self, "", style={"position":"absolute", "border":"{0}px solid #820a0a".format(borderwidth), "background-color":"limegreen"})
@@ -76,7 +76,7 @@ class RequiredTotal(html.DIV):
         self.width = self.height = innersize
         self.total = total
         self.text = total
-        
+
 class CurrentTotal(html.DIV):
     def __init__(self, line, index, total):
         html.DIV.__init__(self, "", style={"position":"absolute", "border":"{0}px solid #820a0a".format(borderwidth), "background-color":"inherit"})
@@ -137,7 +137,7 @@ class Domino(html.DIV):
             self.setrotation(0)
         (self.startleft, self.starttop) = (self.left, self.top)
         self.style.backgroundColor = "black"
-        
+
     def rotate(self):
         self.style.transition = "all 1s"
         self.setrotation((self.rotation + 180) % 360)
@@ -145,7 +145,7 @@ class Domino(html.DIV):
             (self.left, self.top) = (game.board.left+self.pos.left + 2*borderwidth, game.board.top+self.pos.top + 2*borderwidth)
         else:
             (self.left, self.top) = (self.originalleft, self.originaltop)
-        
+
     def setrotation(self, rotation):
         self.rotation = rotation
         if rotation in [90, 270]:
@@ -154,7 +154,7 @@ class Domino(html.DIV):
             self.transform = "rotate({0}deg)".format(self.rotation)
         self.style.transform = self.transform
         self.style.webkitTransform = self.transform
-        
+
     def mousedown(self, event):
         global touchevents
         if event.type == "touchstart": touchevents = True
@@ -162,7 +162,7 @@ class Domino(html.DIV):
             event.preventDefault()
             event.stopPropagation()
             return
-            
+
         global drag, dragobject, Xdragstart, Ydragstart
         Xdragstart = event.targetTouches[0].clientX if event.type == "touchstart" else event.clientX
         Ydragstart = event.targetTouches[0].clientY if event.type == "touchstart" else event.clientY
@@ -172,7 +172,7 @@ class Domino(html.DIV):
         dragobject = self
         event.preventDefault()
         event.stopPropagation()
-    
+
     def mouseup(self, event):
         if touchevents and event.type == "mouseup":
             event.preventDefault()
@@ -212,14 +212,14 @@ class Game(html.DIV):
         pattern = patterns[choice(patternnumbers[level])]
         domcount = len(pattern)
         (boardwidth, boardheight) = (4, 3) if domcount == 6 else (5, 4) if domcount == 10 else (6, 4)
-            
+
         self.board = Board(boardwidth, boardheight, pattern)
         self <= self.board
         self.rowtotals = RowTotals(self.board)
         self <= self.rowtotals
         self.coltotals = ColumnTotals(self.board)
         self <= self.coltotals
-    
+
         dotcount = {(i,j):0 for i in range(boardwidth) for j in range(boardheight)}
         """
         direction = "H" if randrange(2) else "V"
@@ -248,7 +248,7 @@ class Game(html.DIV):
             j = randrange(2)
             dotcount[pattern[i][0]] = dots[i][j]
             dotcount[pattern[i][1]] = dots[i][1-j]
-            
+
         for rowno in range(boardheight):
             total = sum(dotcount[(i, rowno)] for i in range(boardwidth))
             self.rowtotals.requiredtotals[rowno].total = total
@@ -257,7 +257,7 @@ class Game(html.DIV):
             total = sum(dotcount[(colno, j)] for j in range(boardheight))
             self.coltotals.requiredtotals[colno].total = total
             self.coltotals.requiredtotals[colno].text = total
-            
+
         self.dominos = dominos = [Domino(*dotcounts) for dotcounts in dots]
         """
         dominos = []
@@ -307,7 +307,7 @@ class Game(html.DIV):
             else:
                 self.rowtotals.currenttotals[rowno].style.backgroundColor = "inherit"
                 winner = False
-            
+
         for colno in range(boardwidth):
             total = sum(dotcount[(colno, j)] for j in range(boardheight))
             self.coltotals.currenttotals[colno].text = total
@@ -319,7 +319,7 @@ class Game(html.DIV):
             else:
                 self.coltotals.currenttotals[colno].style.backgroundColor = "inherit"
                 winner = False
-        
+
         if winner:
             set_timeout(showwin, 1500)
 
@@ -346,7 +346,7 @@ class Game(html.DIV):
                 board.currentpos = None
             event.preventDefault()
             event.stopPropagation()
-        
+
     def mouseup(self, event):
         global drag, dragobject
         drag = False
@@ -377,7 +377,7 @@ def restart(event):
     game.clearboard()
 
 def showrules(event):
-    alert(rules)        
+    alert(rules)
 
 rules = """How to play:
 Drag the dominos onto the board, arranging them so that the total number of spots in each row and column is equal to the number in the green box.
@@ -444,8 +444,8 @@ document["restart"].bind("click",restart)
 document["showrules"].bind("click",showrules)
 
 (boxwidth, boxheight) = (document["drawarea"].clientWidth, document["drawarea"].clientHeight)
-headerheight = document["header"].height
-controlsheight = document["controls"].height
+headerheight = document["header"].clientHeight
+controlsheight = document["controls"].clientHeight
 innersize = int(min(boxwidth/14, (boxheight-headerheight-controlsheight)/7))
 borderwidth = int(innersize/20)
 outersize = innersize+2*borderwidth
